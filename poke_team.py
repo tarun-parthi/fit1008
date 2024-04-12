@@ -9,13 +9,30 @@ class PokeTeam:
     CRITERION_LIST = ["health", "defence", "battle_power", "speed", "level"]
 
     def __init__(self):
-        self.team = None # change None value if necessary
+        self.team = ArrayR(self.TEAM_LIMIT) # change None value if necessary
         self.team_count = 0
 
     def choose_manually(self):
-        raise NotImplementedError
+        print("Please choose your Pokemon (Enter the name): ")
+        chosen = 0
+        while chosen < self.TEAM_LIMIT:
+            for index, poke in enumerate(self.POKE_LIST, 1):
+                print(f"{index}. {poke}")
+            choice = input("Choose a Pokemon by number (or 'done' to finish): ")
+            if choice.lower() == 'done' and chosen > 0:
+                break
+            try:
+                poke_choice = self.POKE_LIST[int(choice) - 1]
+                self.team[chosen] = poke_choice()  
+                chosen += 1
+            except (ValueError, IndexError):
+                print("Invalid choice, try again.")
+
+        self.team_count = chosen
 
     def choose_randomly(self) -> None:
+         self.team = ArrayR([random.choice(self.POKE_LIST)() for _ in range(self.TEAM_LIMIT)])
+        self.team_count = self.TEAM_LIMIT
         all_pokemon = get_all_pokemon_types()
         self.team_count = 0
         for i in range(self.TEAM_LIMIT):
@@ -36,13 +53,20 @@ class PokeTeam:
         raise NotImplementedError
 
     def __getitem__(self, index: int):
-        raise NotImplementedError
+       if 0 <= index < self.team_count:
+            return self.team[index]
+        else:
+            raise IndexError("Team index out of range")
+
 
     def __len__(self):
-        raise NotImplementedError
+        return self.team_count
 
     def __str__(self):
-        raise NotImplementedError
+        team_str = "Team:\n"
+        for i in range(self.team_count):
+            team_str += f"{i+1}. {str(self.team[i])}\n"  # Assuming each Pokemon has a __str__ method.
+        return team_str
 
 class Trainer:
 
