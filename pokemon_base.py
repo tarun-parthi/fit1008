@@ -174,6 +174,14 @@ class Pokemon(ABC): # pylint: disable=too-few-public-methods, too-many-instance-
         return self.battle_power
 
     def attack(self, other_pokemon) -> float:
+
+        base_damage = self.get_battle_power()
+
+        effectiveness = TypeEffectiveness.get_effectiveness(self.get_poketype(), other_pokemon.get_poketype())
+
+        damage = int(base_damage * effectiveness)
+        return damage
+        
         """
         Calculates and returns the damage that this Pokemon inflicts on the
         other Pokemon during an attack.
@@ -208,6 +216,18 @@ class Pokemon(ABC): # pylint: disable=too-few-public-methods, too-many-instance-
             self._evolve()
 
     def _evolve(self) -> None:
+
+        current_index = self.evolution_line.index(self.name)
+
+        if current_index < len(self.evolution_line) - 1:
+            next_evolution = self.evolution_line[current_index + 1]
+
+        self.name = next_evolution
+            self.health = int(self.health * 1.5)
+            self.battle_power = int(self.battle_power * 1.5)
+            self.speed = int(self.speed * 1.5)
+            self.defence = int(self.defence * 1.5)
+        
         """
         Evolves the Pokemon to the next stage in its evolution line, and updates
           its attributes accordingly.
